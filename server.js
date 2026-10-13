@@ -224,7 +224,7 @@ app.use((err, req, res, next) => {
 });
 
 // ================= SEED (inside boot) =================
-async function boot() {
+async function init() {
   await db.init();
   console.log(`Database ready (dialect: ${db.dialect}).`);
   await bootstrap.ensureAdmin();
@@ -238,7 +238,15 @@ async function boot() {
       console.log('Seeded Chapter 1 from the novel manuscript.');
     } catch { console.log('No chapter seed found; starting with an empty library.'); }
   }
+}
+
+async function boot() {
+  await init();
   app.listen(PORT, () => console.log(`The Gilded Cage running → http://localhost:${PORT}  (AUTH_MODE=${process.env.AUTH_MODE || 'password'}, OTP_PROVIDER=${process.env.OTP_PROVIDER || 'dev'})`));
 }
 
-boot().catch((e) => { console.error('Failed to start:', e); process.exit(1); });
+// Only auto-start when run directly (npm start). Serverless hosts import { app, init } instead.
+if (require.main === module) {
+  boot().catch((e) => { console.error('Failed to start:', e); process.exit(1); });
+}
+module.exports = { app, init };

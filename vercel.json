@@ -1,0 +1,1 @@
+{"functions":{"api/index.js":{"includeFiles":"views/**,public/**,seed/**"}},"rewrites":[{"destination":"/api/index","source":"/(.*)"}]}
