@@ -1,3 +1,13 @@
+---
+title: The Gilded Cage
+emoji: 📖
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # The Gilded Cage
 
 A Reddit-style reading community for the novel *The Gilded Cage*. Readers log
