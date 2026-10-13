@@ -211,6 +211,9 @@ require('./routes/auth')(app, ctx);
 require('./routes/community')(app, ctx);
 require('./routes/admin')(app, ctx);
 
+// Health check for container hosts (no auth, no DB writes).
+app.get('/healthz', async (req, res) => res.status(200).send('ok'));
+
 // ================= ERRORS =================
 app.use(async (req, res) => res.status(404).render('404', { title: 'Page not found' }));
 // eslint-disable-next-line no-unused-vars
