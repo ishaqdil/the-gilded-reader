@@ -1,0 +1,22 @@
+<%#
+  Vote widget partial.
+  Locals: targetType ('post' | 'chapter' | 'comment'), id, score, userVote (1 | -1 | 0),
+          compact (optional, true renders a horizontal compact widget).
+  app.js wires up every [data-vote] button: POST /api/vote {target_type, target_id, value}.
+%>
+<%
+const _targetType = (typeof targetType !== 'undefined' && targetType) ? targetType : 'post';
+const _id = (typeof id !== 'undefined') ? id : 0;
+const _score = (typeof score === 'number') ? score : 0;
+const _userVote = (typeof userVote === 'number') ? userVote : 0;
+const _compact = (typeof compact !== 'undefined') && !!compact;
+%>
+<div class="vote<%= _compact ? ' vote-compact' : '' %>" data-vote-widget data-target-type="<%= _targetType %>" data-target-id="<%= _id %>">
+  <button type="button" class="vote-btn vote-up" data-vote="<%= _targetType %>" data-id="<%= _id %>" data-value="1" aria-pressed="<%= _userVote === 1 ? 'true' : 'false' %>" aria-label="Upvote">
+    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3.2 13.4 11H2.6Z" fill="currentColor"/></svg>
+  </button>
+  <span class="vote-score" aria-live="polite" title="Score"><%= _score %></span>
+  <button type="button" class="vote-btn vote-down" data-vote="<%= _targetType %>" data-id="<%= _id %>" data-value="-1" aria-pressed="<%= _userVote === -1 ? 'true' : 'false' %>" aria-label="Downvote">
+    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 12.8 2.6 5h10.8Z" fill="currentColor"/></svg>
+  </button>
+</div>

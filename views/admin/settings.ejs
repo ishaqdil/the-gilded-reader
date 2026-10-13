@@ -1,0 +1,38 @@
+<div class="page-head">
+  <h1>Site settings</h1>
+  <p class="muted">Changes take effect immediately and are written to the audit log.</p>
+</div>
+
+<%- include('_subnav') %>
+
+<div class="card form-card">
+  <% if (error) { %><p class="alert alert-error" role="alert"><%= error %></p><% } %>
+  <form action="/admin/settings" method="post">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="field">
+      <label for="site_name">Site name</label>
+      <input id="site_name" name="site_name" type="text" maxlength="60" value="<%= settings.site_name %>" required>
+    </div>
+    <div class="field">
+      <label for="tagline">Tagline</label>
+      <input id="tagline" name="tagline" type="text" maxlength="120" value="<%= settings.tagline %>" placeholder="Read new chapters and discuss them with fellow readers.">
+    </div>
+    <div class="field">
+      <label for="rules_text">Community rules</label>
+      <textarea id="rules_text" name="rules_text" rows="6" maxlength="2000" placeholder="Shown to readers on the community page…"><%= settings.rules_text %></textarea>
+      <p class="hint">Max 2000 characters.</p>
+    </div>
+    <div class="field check-field">
+      <label class="check"><input type="checkbox" name="registrations_open" <%= settings.registrations_open ? 'checked' : '' %>> Registrations open</label>
+      <p class="hint">Uncheck to close new sign-ups (the registration flow must check this setting).</p>
+    </div>
+    <div class="field check-field">
+      <label class="check"><input type="checkbox" name="user_posts_enabled" <%= settings.user_posts_enabled ? 'checked' : '' %>> User posts enabled</label>
+      <p class="hint">Uncheck to disable new member posts site-wide (the post flow must check this setting).</p>
+    </div>
+    <div class="form-row">
+      <a class="btn btn-ghost" href="/admin">Cancel</a>
+      <button type="submit" class="btn btn-primary">Save settings</button>
+    </div>
+  </form>
+</div>

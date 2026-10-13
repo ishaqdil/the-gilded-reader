@@ -1,0 +1,56 @@
+<div class="page-head">
+  <h1>Users</h1>
+  <p class="muted"><%= users.length %> shown · Search matches usernames <em>and</em> phone numbers,
+    but phone numbers are never shown here — open a user's phone view to see one
+    (every view is written to the audit log).</p>
+</div>
+
+<%- include('_subnav') %>
+
+<form class="search-bar" action="/admin/users" method="get" role="search">
+  <label class="sr-only" for="q">Search users</label>
+  <input id="q" name="q" type="search" value="<%= q %>" placeholder="Search username or phone…" autocomplete="off">
+  <button type="submit" class="btn btn-primary">Search</button>
+  <% if (q) { %><a class="btn btn-ghost" href="/admin/users">Clear</a><% } %>
+</form>
+
+<% if (users.length) { %>
+  <div class="user-cards">
+    <% users.forEach((u) => { %>
+      <article class="card user-card">
+        <div class="user-card-head">
+          <div>
+            <p class="user-name"><a class="link" href="/u/<%= u.username %>">@<%= u.username %></a></p>
+            <p class="muted small">joined <%= fmtDate(u.created_at).split(',')[0] %> · <%= u.comment_count %> comments</p>
+          </div>
+          <div class="badge-row">
+            <% if (u.role === 'admin') { %><span class="badge badge-info">admin</span><% } %>
+            <% if (u.status === 'blocked') { %><span class="badge badge-warn">blocked</span><% } else { %><span class="badge badge-ok">active</span><% } %>
+          </div>
+        </div>
+        <div class="user-card-actions">
+          <a class="btn btn-ghost btn-sm" href="/admin/users/<%= u.id %>">Details</a>
+          <a class="btn btn-ghost btn-sm" href="/admin/users/<%= u.id %>/phone" title="View phone number (audit-logged)">Phone</a>
+          <% if (u.role !== 'admin') { %>
+            <% if (u.status === 'blocked') { %>
+              <form action="/admin/users/<%= u.id %>/unblock" method="post" class="inline">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button type="submit" class="btn btn-primary btn-sm">Unblock</button>
+              </form>
+            <% } else { %>
+              <form action="/admin/users/<%= u.id %>/block" method="post" class="inline" data-confirm="Block @<%= u.username %>? They will be logged out immediately and cannot log back in.">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button type="submit" class="btn btn-danger-ghost btn-sm">Block</button>
+              </form>
+            <% } %>
+          <% } %>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+<% } else { %>
+  <div class="empty-state empty-inline">
+    <p class="empty-icon" aria-hidden="true">🔍</p>
+    <p class="muted">No users match “<%= q %>”.</p>
+  </div>
+<% } %>

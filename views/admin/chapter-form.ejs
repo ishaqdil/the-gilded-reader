@@ -1,0 +1,37 @@
+<div class="page-head">
+  <h1><%= editing ? 'Edit chapter' : 'New chapter' %></h1>
+</div>
+
+<div class="card form-card">
+  <% if (error) { %><p class="alert alert-error" role="alert"><%= error %></p><% } %>
+  <form action="<%= editing ? '/admin/chapters/' + ch.id : '/admin/chapters' %>" method="post">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="form-grid-2">
+      <div class="field">
+        <label for="number">Chapter number</label>
+        <input id="number" name="number" type="number" min="1" max="100000" value="<%= ch.number %>" required>
+      </div>
+      <div class="field check-field">
+        <label class="check"><input type="checkbox" name="published" <%= ch.published ? 'checked' : '' %>> Published</label>
+        <p class="hint">Uncheck to save as a draft (hidden from readers).</p>
+      </div>
+    </div>
+    <div class="field">
+      <label for="title">Title</label>
+      <input id="title" name="title" type="text" maxlength="200" value="<%= ch.title %>" placeholder="e.g. Morning at the Rajpoot House" required>
+    </div>
+    <div class="field">
+      <label for="excerpt">Preview excerpt <span class="muted">(optional — auto-generated if empty)</span></label>
+      <input id="excerpt" name="excerpt" type="text" maxlength="400" value="<%= ch.excerpt %>" placeholder="One or two hook sentences…">
+    </div>
+    <div class="field">
+      <label for="body">Chapter text</label>
+      <textarea id="body" name="body" rows="18" placeholder="Paste the chapter text here. Blank lines separate paragraphs." required><%= ch.body %></textarea>
+      <p class="hint">Plain text only — blank lines become paragraphs. HTML is not rendered.</p>
+    </div>
+    <div class="form-row">
+      <a class="btn btn-ghost" href="/admin/chapters">Cancel</a>
+      <button type="submit" class="btn btn-primary"><%= editing ? 'Save changes' : 'Publish chapter' %></button>
+    </div>
+  </form>
+</div>

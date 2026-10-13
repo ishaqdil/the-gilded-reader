@@ -1,0 +1,28 @@
+<%#
+  Feed post card. Local: item {kind, id, title, excerpt, author:{username,avatar}, community:{slug,title}|null, score, userVote, commentCount, createdAt, url, pinned}.
+  Used by home.ejs and community.ejs.
+%>
+<%
+const it = item;
+const _kind = it.kind || 'post';
+const _voteType = _kind === 'chapter' ? 'chapter' : 'post';
+%>
+<article class="post-card card">
+  <%- include('vote', { targetType: _voteType, id: it.id, score: it.score, userVote: it.userVote }) %>
+  <div class="post-card-main">
+    <div class="post-card-top">
+      <% if (it.pinned) { %><span class="badge badge-pin">📌 Pinned</span><% } %>
+      <% if (_kind === 'chapter') { %><span class="badge">Chapter</span><% } %>
+      <% if (it.community) { %><a class="community-tag" href="/c/<%= it.community.slug %>">c/<%= it.community.title %></a><% } %>
+    </div>
+    <h3 class="post-card-title"><a href="<%= it.url %>"><%= it.title %></a></h3>
+    <% if (it.excerpt) { %><p class="post-card-excerpt"><%= it.excerpt %></p><% } %>
+    <p class="post-meta muted">
+      <% if (it.author) { %>
+        <span class="meta-author"><%- include('avatar', { name: it.author.avatar, cls: 'avatar avatar-xs' }) %><a class="link" href="/u/<%= it.author.username %>">u/<%= it.author.username %></a></span><span aria-hidden="true"> · </span>
+      <% } %>
+      <time datetime="<%= it.createdAt %>"><%= fmtDate(it.createdAt) %></time><span aria-hidden="true"> · </span>
+      <a class="link" href="<%= it.url %>#comments"><%= it.commentCount %> comment<%= it.commentCount === 1 ? '' : 's' %></a>
+    </p>
+  </div>
+</article>

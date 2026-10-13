@@ -1,0 +1,39 @@
+<%
+const _notifications = (typeof notifications !== 'undefined' && Array.isArray(notifications)) ? notifications : [];
+const _icons = { reply: '💬', mention: '📣', vote: '▲', report: '🚩', mod: '🛡️' };
+const _verbs = { reply: 'replied to you', mention: 'mentioned you', vote: 'voted on your post', report: 'was reported', mod: 'needs your attention' };
+%>
+<div class="page-head split">
+  <div>
+    <h1>Inbox</h1>
+    <p class="muted">Replies, mentions and updates on your posts.</p>
+  </div>
+  <% if (_notifications.length) { %>
+    <button id="markAllRead" class="btn btn-ghost btn-sm">Mark all read</button>
+  <% } %>
+</div>
+
+<% if (_notifications.length) { %>
+<ul class="notif-list">
+  <% _notifications.forEach(function (n) { %>
+    <%
+      const _url = n.targetType === 'post' ? '/p/' + n.targetId
+        : (n.targetType === 'chapter' ? '/chapter/' + n.targetId + '#comments' : '#');
+      const _icon = _icons[n.type] || '🔔';
+      const _verb = _verbs[n.type] || 'sent you a notification';
+    %>
+    <li class="card notif<%= n.isRead ? '' : ' unread' %>" data-notif-id="<%= n.id %>">
+      <a class="notif-link" href="<%= _url %>">
+        <span class="notif-icon" aria-hidden="true"><%= _icon %></span>
+        <span class="notif-body">
+          <span class="notif-title"><strong>@<%= n.actorUsername %></strong> <%= _verb %></span>
+          <% if (n.excerpt) { %><span class="notif-excerpt">“<%= n.excerpt %>”</span><% } %>
+          <span class="muted small notif-time"><%= fmtDate(n.createdAt) %></span>
+        </span>
+      </a>
+    </li>
+  <% }) %>
+</ul>
+<% } else { %>
+  <%- include('partials/empty', { icon: '🔔', title: "You're all caught up", text: 'New replies and mentions will appear here.' }) %>
+<% } %>

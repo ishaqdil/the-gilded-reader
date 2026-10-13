@@ -1,0 +1,27 @@
+<div class="page-head">
+  <h1>Chapters</h1>
+  <p class="muted">Read in order — each chapter picks up where the last left off.</p>
+</div>
+
+<% if (chapters.length) { %>
+  <div class="card-grid">
+    <% chapters.forEach((c) => { %>
+      <article class="card chapter-card">
+        <p class="card-kicker">Chapter <%= c.number %></p>
+        <h2 class="card-title"><%= c.title %></h2>
+        <% if (c.excerpt) { %><p class="card-excerpt"><%= c.excerpt %>…</p><% } %>
+        <div class="card-foot">
+          <time class="muted"><%= fmtDate(c.created_at).split(',')[0] %></time>
+          <a class="btn btn-primary btn-sm" href="/chapter/<%= c.id %>">Read chapter</a>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+<% } else { %>
+  <div class="empty-state">
+    <p class="empty-icon" aria-hidden="true">📚</p>
+    <h2>No chapters yet</h2>
+    <p class="muted">The author hasn't published anything here. Come back soon — the story is coming.</p>
+    <a class="btn btn-primary" href="/">Back home</a>
+  </div>
+<% } %>

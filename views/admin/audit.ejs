@@ -1,0 +1,34 @@
+<div class="page-head">
+  <h1>Audit log</h1>
+  <p class="muted"><%= total %> entries · page <%= page %> of <%= pages %> · includes every phone-number view</p>
+</div>
+
+<%- include('_subnav') %>
+
+<% if (rows.length) { %>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>When</th><th>Admin</th><th>Action</th><th>Target</th><th>Detail</th></tr></thead>
+      <tbody>
+        <% rows.forEach((a) => { %>
+          <tr>
+            <td data-label="When" class="muted small"><%= fmtDate(a.created_at) %></td>
+            <td data-label="Admin">@<%= a.admin_name || '—' %></td>
+            <td data-label="Action"><code><%= a.action %></code></td>
+            <td data-label="Target" class="muted small"><%= a.target_type || '' %><%= a.target_id != null ? ' #' + a.target_id : '' %></td>
+            <td data-label="Detail" class="muted small"><%= a.detail || '' %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <div class="form-row" role="navigation" aria-label="Audit pages">
+    <% if (page > 1) { %><a class="btn btn-ghost btn-sm" href="/admin/audit?page=<%= page - 1 %>">← Newer</a><% } %>
+    <% if (page < pages) { %><a class="btn btn-ghost btn-sm" href="/admin/audit?page=<%= page + 1 %>">Older →</a><% } %>
+  </div>
+<% } else { %>
+  <div class="empty-state empty-inline">
+    <p class="empty-icon" aria-hidden="true">📋</p>
+    <p class="muted">No audit entries yet.</p>
+  </div>
+<% } %>

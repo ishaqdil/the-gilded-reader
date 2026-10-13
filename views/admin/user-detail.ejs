@@ -1,0 +1,83 @@
+<div class="page-head">
+  <h1>User: @<%= u.username %></h1>
+  <p class="muted">joined <%= fmtDate(u.created_at) %></p>
+</div>
+
+<%- include('_subnav') %>
+
+<div class="card">
+  <div class="user-card-head">
+    <div>
+      <p class="user-name">@<%= u.username %></p>
+      <p class="muted small">
+        <% if (u.bio) { %><%= u.bio %><br><% } %>
+        <%= counts.posts %> posts · <%= counts.comments %> comments · <%= counts.votes %> votes ·
+        filed <%= counts.reportsFiled %> reports · <%= counts.reportsAgainst %> reports against them
+      </p>
+    </div>
+    <div class="badge-row">
+      <% if (u.role === 'admin') { %><span class="badge badge-info">admin</span><% } %>
+      <% if (u.status === 'blocked') { %><span class="badge badge-warn">blocked</span><% } else { %><span class="badge badge-ok">active</span><% } %>
+      <% if (u.phone_verified) { %><span class="badge badge-ok">phone verified</span><% } %>
+    </div>
+  </div>
+  <div class="user-card-actions">
+    <a class="btn btn-ghost btn-sm" href="/admin/users/<%= u.id %>/phone" title="View phone number (audit-logged)">View phone</a>
+    <% if (!me && u.role !== 'admin') { %>
+      <% if (u.status === 'blocked') { %>
+        <form action="/admin/users/<%= u.id %>/unblock" method="post" class="inline">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-primary btn-sm">Unblock</button>
+        </form>
+      <% } else { %>
+        <form action="/admin/users/<%= u.id %>/block" method="post" class="inline" data-confirm="Block @<%= u.username %>? They will be logged out immediately and cannot log back in.">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-danger-ghost btn-sm">Block</button>
+        </form>
+      <% } %>
+    <% } %>
+    <a class="btn btn-ghost btn-sm" href="/admin/users">← All users</a>
+  </div>
+</div>
+
+<section>
+  <h2>Reports against this user</h2>
+  <% if (reportsAgainst.length) { %>
+    <ul class="activity-list">
+      <% reportsAgainst.forEach((r) => { %>
+        <li class="card">
+          <p class="activity-text"><%= r.reason %></p>
+          <p class="muted small">reported by @<%= r.reporter %> · target: <%= r.target_type %> #<%= r.target_id %> ·
+            <span class="badge <%= r.status === 'open' ? 'badge-warn' : '' %>"><%= r.status %></span> ·
+            <%= fmtDate(r.created_at) %></p>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <div class="empty-state empty-inline"><p class="muted">No reports against this user.</p></div>
+  <% } %>
+</section>
+
+<section>
+  <h2>Audit history</h2>
+  <% if (auditRows.length) { %>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>When</th><th>Admin</th><th>Action</th><th>Target</th><th>Detail</th></tr></thead>
+        <tbody>
+          <% auditRows.forEach((a) => { %>
+            <tr>
+              <td data-label="When" class="muted small"><%= fmtDate(a.created_at) %></td>
+              <td data-label="Admin">@<%= a.admin_name || '—' %></td>
+              <td data-label="Action"><code><%= a.action %></code></td>
+              <td data-label="Target" class="muted small"><%= a.target_type || '' %><%= a.target_id != null ? ' #' + a.target_id : '' %></td>
+              <td data-label="Detail" class="muted small"><%= a.detail || '' %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="empty-state empty-inline"><p class="muted">No audit entries for this user.</p></div>
+  <% } %>
+</section>

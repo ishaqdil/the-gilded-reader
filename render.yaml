@@ -1,0 +1,23 @@
+# Render.com deployment (free tier)
+services:
+  - type: web
+    name: the-gilded-cage
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: ADMIN_USER
+        value: admin
+      # Optional: preset the one-time admin claim token. If unset, the server
+      # prints a random claim URL to the logs on first boot.
+      - key: ADMIN_CLAIM_TOKEN
+        generateValue: true
+      # Optional: authentication mode. 'password' (default, free) or 'otp'.
+      - key: AUTH_MODE
+        value: password
+      # Paste your Neon Postgres connection string here (see DEPLOY.md).
+      # With it set, the app stores everything in Neon (permanent).
+      # Without it, it falls back to a local SQLite file (wiped on restart).
+      - key: DATABASE_URL
+        sync: false

@@ -1,0 +1,80 @@
+<%
+const _avatarNames = ['lantern', 'key', 'rose', 'crown', 'dove', 'moon', 'door', 'mask'];
+const _comments = (typeof comments !== 'undefined' && Array.isArray(comments)) ? comments : [];
+const _error = (typeof error !== 'undefined') ? error : null;
+const _okMsg = (typeof okMsg !== 'undefined') ? okMsg : null;
+%>
+<div class="page-head">
+  <h1>@<%= me.username %></h1>
+  <p class="muted">Member since <%= fmtDate(me.created_at).split(',')[0] %> · <%= me.role === 'admin' ? 'Admin' : 'Reader' %></p>
+</div>
+
+<div class="two-col">
+  <div>
+    <section class="card" aria-labelledby="profile-h" style="margin-bottom: 1.5rem;">
+      <h2 id="profile-h">Profile</h2>
+      <% if (_error) { %><p class="alert alert-error" role="alert"><%= _error %></p><% } %>
+      <% if (_okMsg) { %><p class="alert alert-ok" role="status"><%= _okMsg %></p><% } %>
+      <form action="/me/profile" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <fieldset class="avatar-picker">
+          <legend>Avatar</legend>
+          <div class="avatar-options">
+            <% _avatarNames.forEach(function (n) { %>
+              <label class="avatar-option">
+                <input type="radio" name="avatar" value="<%= n %>" <%= me.avatar === n ? 'checked' : '' %>>
+                <%- include('partials/avatar', { name: n, cls: 'avatar' }) %>
+                <span class="sr-only"><%= n %></span>
+              </label>
+            <% }) %>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="bio">Bio</label>
+          <textarea id="bio" name="bio" rows="3" maxlength="300" placeholder="A line or two about you…" data-autocount="bioCount"><%= me.bio || '' %></textarea>
+          <p class="hint"><span id="bioCount">0</span>/300</p>
+        </div>
+        <button type="submit" class="btn btn-primary">Save profile</button>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="pw-h">
+      <h2 id="pw-h">Change password</h2>
+      <form action="/me/password" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="field">
+          <label for="current">Current password</label>
+          <input id="current" name="current" type="password" autocomplete="current-password" required>
+        </div>
+        <div class="field">
+          <label for="next">New password</label>
+          <input id="next" name="next" type="password" autocomplete="new-password" minlength="8" required>
+          <p class="hint">At least 8 characters.</p>
+        </div>
+        <button type="submit" class="btn btn-primary">Update password</button>
+      </form>
+    </section>
+  </div>
+
+  <section aria-labelledby="recent-h">
+    <h2 id="recent-h">Your recent comments</h2>
+    <% if (_comments.length) { %>
+      <ul class="activity-list">
+        <% _comments.forEach((c) => { %>
+          <li class="card">
+            <p class="activity-text"><%= c.body %></p>
+            <p class="muted small">
+              <% if (c.chid) { %>on <a class="link" href="/chapter/<%= c.chid %>#comments">Chapter <%= c.number %>: <%= c.title %></a>
+              <% } else if (c.post_id || c.postId) { %>on <a class="link" href="/p/<%= c.post_id || c.postId %>#comments">a post</a>
+              <% } %> · <%= fmtDate(c.created_at) %>
+            </p>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <div class="empty-state empty-inline">
+        <p class="muted">You haven't commented yet. <a class="link" href="/chapters">Find a chapter</a> and share your thoughts.</p>
+      </div>
+    <% } %>
+  </section>
+</div>

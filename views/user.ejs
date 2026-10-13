@@ -1,0 +1,61 @@
+<%
+const _stats = (typeof stats !== 'undefined' && stats) ? stats : { posts: 0, comments: 0, karma: 0 };
+const _posts = (typeof posts !== 'undefined' && Array.isArray(posts)) ? posts : [];
+const _comments = (typeof comments !== 'undefined' && Array.isArray(comments)) ? comments : [];
+%>
+<div class="profile-head card">
+  <%- include('partials/avatar', { name: profile.avatar, cls: 'avatar avatar-xl' }) %>
+  <div>
+    <h1>@<%= profile.username %></h1>
+    <% if (profile.bio) { %><p class="bio"><%= profile.bio %></p><% } %>
+    <p class="muted small">Member since <%= fmtDate(profile.created_at).split(',')[0] %></p>
+  </div>
+</div>
+
+<div class="stat-cards" aria-label="Reader stats">
+  <div class="card stat"><p class="stat-num"><%= _stats.posts %></p><p class="muted">Posts</p></div>
+  <div class="card stat"><p class="stat-num"><%= _stats.comments %></p><p class="muted">Comments</p></div>
+  <div class="card stat"><p class="stat-num"><%= _stats.karma %></p><p class="muted">Karma</p></div>
+</div>
+
+<section aria-labelledby="posts-h">
+  <div class="section-head"><h2 id="posts-h">Recent posts</h2></div>
+  <% if (_posts.length) { %>
+    <ul class="activity-list">
+      <% _posts.forEach((p) => { %>
+        <li class="card">
+          <p class="activity-text"><a class="link" href="<%= p.url || ('/p/' + p.id) %>"><%= p.title %></a></p>
+          <p class="muted small"><%= p.commentCount != null ? p.commentCount + ' comments · ' : '' %><%= fmtDate(p.created_at || p.createdAt) %></p>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <div class="empty-state empty-inline">
+      <p class="empty-icon" aria-hidden="true">📝</p>
+      <p class="muted">@<%= profile.username %> hasn't posted yet.</p>
+    </div>
+  <% } %>
+</section>
+
+<section aria-labelledby="act-h">
+  <div class="section-head"><h2 id="act-h">Recent comments</h2></div>
+  <% if (_comments.length) { %>
+    <ul class="activity-list">
+      <% _comments.forEach((c) => { %>
+        <li class="card">
+          <p class="activity-text"><%= c.body %></p>
+          <p class="muted small">
+            <% if (c.chid) { %>on <a class="link" href="/chapter/<%= c.chid %>#comments">Chapter <%= c.number %>: <%= c.title %></a>
+            <% } else if (c.post_id || c.postId) { %>on <a class="link" href="/p/<%= c.post_id || c.postId %>#comments"><%= c.post_title || 'a post' %></a>
+            <% } %> · <%= fmtDate(c.created_at) %>
+          </p>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <div class="empty-state empty-inline">
+      <p class="empty-icon" aria-hidden="true">💬</p>
+      <p class="muted">@<%= profile.username %> hasn't commented yet.</p>
+    </div>
+  <% } %>
+</section>

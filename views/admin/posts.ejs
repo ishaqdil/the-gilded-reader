@@ -1,0 +1,75 @@
+<div class="page-head split">
+  <div>
+    <h1>Posts</h1>
+    <p class="muted"><%= posts.length %> shown</p>
+  </div>
+</div>
+
+<%- include('_subnav') %>
+
+<p class="muted small">Announcement posts in locked communities (member posts off): create them from the community page while logged in as admin — admins bypass the allow_posts restriction. No separate admin create form is needed.</p>
+
+<form class="search-bar" action="/admin/posts" method="get">
+  <label class="sr-only" for="status">Status</label>
+  <select id="status" name="status">
+    <option value="" <%= !statusF ? 'selected' : '' %>>All statuses</option>
+    <option value="visible" <%= statusF === 'visible' ? 'selected' : '' %>>Visible</option>
+    <option value="hidden" <%= statusF === 'hidden' ? 'selected' : '' %>>Hidden</option>
+  </select>
+  <label class="sr-only" for="community">Community</label>
+  <select id="community" name="community">
+    <option value="" <%= !communityF ? 'selected' : '' %>>All communities</option>
+    <% communities.forEach((c) => { %>
+      <option value="<%= c.id %>" <%= String(communityF) === String(c.id) ? 'selected' : '' %>>/<%= c.slug %></option>
+    <% }) %>
+  </select>
+  <button type="submit" class="btn btn-primary">Filter</button>
+  <% if (statusF || communityF) { %><a class="btn btn-ghost" href="/admin/posts">Clear</a><% } %>
+</form>
+
+<% if (posts.length) { %>
+  <ul class="activity-list">
+    <% posts.forEach((p) => { %>
+      <li class="card mod-card">
+        <p class="activity-text"><%= p.title %></p>
+        <p class="muted small"><%= p.excerpt %>…</p>
+        <p class="muted small">@<%= p.username %> · /<%= p.community_slug %> · score <%= p.score %> · <%= p.comment_count %> comments · <%= fmtDate(p.created_at) %>
+          <% if (p.pinned) { %><span class="badge badge-info">pinned</span><% } %>
+          <% if (p.status === 'hidden') { %><span class="badge badge-warn">hidden</span><% } %></p>
+        <div class="mod-actions">
+          <% if (p.pinned) { %>
+            <form action="/admin/posts/<%= p.id %>/unpin" method="post" class="inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-ghost btn-sm">Unpin</button>
+            </form>
+          <% } else { %>
+            <form action="/admin/posts/<%= p.id %>/pin" method="post" class="inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-ghost btn-sm">Pin</button>
+            </form>
+          <% } %>
+          <% if (p.status === 'hidden') { %>
+            <form action="/admin/posts/<%= p.id %>/show" method="post" class="inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-primary btn-sm">Restore</button>
+            </form>
+          <% } else { %>
+            <form action="/admin/posts/<%= p.id %>/hide" method="post" class="inline" data-confirm="Hide this post?">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-ghost btn-sm">Hide</button>
+            </form>
+          <% } %>
+          <form action="/admin/posts/<%= p.id %>/delete" method="post" class="inline" data-confirm="Permanently delete this post? Its comments and votes will also be removed.">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="btn btn-danger-ghost btn-sm">Delete</button>
+          </form>
+        </div>
+      </li>
+    <% }) %>
+  </ul>
+<% } else { %>
+  <div class="empty-state empty-inline">
+    <p class="empty-icon" aria-hidden="true">📮</p>
+    <p class="muted">No posts match.</p>
+  </div>
+<% } %>

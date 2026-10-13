@@ -1,0 +1,20 @@
+<%#
+  Pagination partial. Locals: page, totalPages, baseUrl (query string before &page=, e.g. '/?sort=latest' or '/c/general').
+%>
+<%
+const _page = Number(page) || 1;
+const _total = Number(totalPages) || 1;
+const _base = (typeof baseUrl !== 'undefined' && baseUrl) ? baseUrl : '?';
+const _sep = _base.indexOf('?') === -1 ? '?' : ((_base.endsWith('?') || _base.endsWith('&')) ? '' : '&');
+%>
+<% if (_total > 1) { %>
+<nav class="pagination" aria-label="Pagination">
+  <% if (_page > 1) { %>
+    <a class="btn btn-ghost btn-sm" href="<%= _base %><%= _sep %>page=<%= _page - 1 %>" rel="prev">← Newer</a>
+  <% } else { %><span></span><% } %>
+  <span class="muted small" aria-current="page">Page <%= _page %> of <%= _total %></span>
+  <% if (_page < _total) { %>
+    <a class="btn btn-ghost btn-sm" href="<%= _base %><%= _sep %>page=<%= _page + 1 %>" rel="next">Older →</a>
+  <% } else { %><span></span><% } %>
+</nav>
+<% } %>

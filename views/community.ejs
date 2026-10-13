@@ -1,0 +1,51 @@
+<%
+const _posts = (typeof posts !== 'undefined' && Array.isArray(posts)) ? posts : [];
+const _canPost = (typeof canPost !== 'undefined') && !!canPost;
+const _cid = (community && community.id) ? community.id : '';
+%>
+<div class="page-head split">
+  <div>
+    <p class="eyebrow">c/<%= community.slug %></p>
+    <h1><%= community.title %></h1>
+    <% if (community.description) { %><p class="muted"><%= community.description %></p><% } %>
+  </div>
+  <% if (_canPost) { %>
+    <button id="newPostToggle" class="btn btn-primary" aria-expanded="false" aria-controls="newPostCard">New post</button>
+  <% } %>
+</div>
+
+<% if (_canPost) { %>
+<section class="card new-post-card" id="newPostCard" hidden aria-labelledby="newpost-h">
+  <h2 id="newpost-h">New post in c/<%= community.title %></h2>
+  <form id="newPostForm" novalidate>
+    <input type="hidden" name="community_id" value="<%= _cid %>">
+    <div class="field">
+      <label for="postTitle">Title</label>
+      <input id="postTitle" name="title" type="text" maxlength="200" required autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="postBody">Body</label>
+      <textarea id="postBody" name="body" rows="6" maxlength="10000" required></textarea>
+    </div>
+    <div class="form-row">
+      <span class="muted small">Be kind — house rules apply.</span>
+      <button class="btn btn-primary" type="submit">Publish post</button>
+    </div>
+  </form>
+</section>
+<% } else if (!user) { %>
+  <div class="card login-nudge">
+    <p><a class="link" href="/login?next=<%= encodeURIComponent('/c/' + community.slug) %>">Log in</a> to start a discussion in this community.</p>
+  </div>
+<% } %>
+
+<% if (_posts.length) { %>
+  <div class="feed">
+    <% _posts.forEach(function (item) { %>
+      <%- include('partials/post-card', { item: item }) %>
+    <% }) %>
+  </div>
+  <%- include('partials/pagination', { page: page, totalPages: totalPages, baseUrl: '/c/' + community.slug }) %>
+<% } else { %>
+  <%- include('partials/empty', { icon: '💬', title: 'No posts yet', text: 'No posts yet — be the first to start a discussion.' }) %>
+<% } %>

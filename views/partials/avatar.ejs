@@ -1,0 +1,10 @@
+<%#
+  Avatar partial — renders the reader's chosen avatar emoji.
+  Locals: name (avatar key), cls (optional extra classes, defaults to 'avatar').
+  The AVATAR_EMOJI map is the single source of truth; profile.ejs reuses the same keys.
+%>
+<%
+const AVATAR_EMOJI = { lantern: '🪔', key: '🔑', rose: '🌹', crown: '👑', dove: '🕊️', moon: '🌙', door: '🚪', mask: '🎭' };
+const _name = (typeof name !== 'undefined' && AVATAR_EMOJI[name]) ? name : 'lantern';
+const _cls = (typeof cls !== 'undefined' && cls) ? cls : 'avatar';
+%><span class="<%= _cls %>" role="img" aria-label="<%= _name %> avatar"><%= AVATAR_EMOJI[_name] %></span>

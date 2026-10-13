@@ -1,0 +1,47 @@
+<div class="progress-track" aria-hidden="true"><div class="progress-fill" id="readProgress"></div></div>
+
+<article class="reader" data-chapter-id="<%= ch.id %>">
+  <header class="reader-head">
+    <p class="eyebrow">Chapter <%= ch.number %></p>
+    <h1 class="reader-title"><%= ch.title %></h1>
+    <p class="muted reader-meta"><time datetime="<%= ch.created_at %>"><%= fmtDate(ch.created_at) %></time> · <%= commentCount %> comment<%= commentCount === 1 ? '' : 's' %></p>
+    <div class="reader-vote">
+      <%- include('partials/vote', { targetType: 'chapter', id: ch.id, score: (typeof ch.score === 'number' ? ch.score : 0), userVote: (typeof ch.userVote === 'number' ? ch.userVote : 0) }) %>
+    </div>
+  </header>
+
+  <div class="prose">
+    <%- formatBody(ch.body) %>
+  </div>
+
+  <nav class="chapter-nav" aria-label="Chapter navigation">
+    <% if (prev) { %>
+      <a class="btn btn-ghost" href="/chapter/<%= prev.id %>">← Ch. <%= prev.number %></a>
+    <% } else { %><span></span><% } %>
+    <a class="btn btn-ghost" href="/chapters">All chapters</a>
+    <% if (next) { %>
+      <a class="btn btn-primary" href="/chapter/<%= next.id %>">Ch. <%= next.number %> →</a>
+    <% } else { %><span></span><% } %>
+  </nav>
+</article>
+
+<section class="comments" id="comments" aria-labelledby="comments-h">
+  <h2 id="comments-h">Discussion</h2>
+
+  <% if (user) { %>
+    <form class="comment-form" data-comment-form data-thread-type="chapter" data-thread-id="<%= ch.id %>">
+      <label for="commentBody">Share your thoughts <span class="muted">(be kind)</span></label>
+      <textarea id="commentBody" name="body" rows="3" maxlength="2000" placeholder="What did you think of this chapter?" required data-autocount="charCount"></textarea>
+      <div class="form-row">
+        <span class="muted char-count"><span id="charCount">0</span>/2000</span>
+        <button type="submit" class="btn btn-primary">Post comment</button>
+      </div>
+    </form>
+  <% } else { %>
+    <div class="card login-nudge">
+      <p><a class="link" href="/login?next=<%= encodeURIComponent('/chapter/' + ch.id + '#comments') %>">Log in</a> or <a class="link" href="/register">create an account</a> to join the discussion.</p>
+    </div>
+  <% } %>
+
+  <div class="thread" data-thread="chapter" data-id="<%= ch.id %>" data-count="<%= commentCount %>" aria-live="polite"></div>
+</section>

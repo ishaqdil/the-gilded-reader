@@ -1,0 +1,20 @@
+<div class="page-head">
+  <h1>Phone number</h1>
+  <p class="muted">Restricted view — phone numbers are only ever shown on this page.</p>
+</div>
+
+<%- include('_subnav') %>
+
+<p class="alert alert-error" role="alert">⚠ This view has been written to the audit log. Do not copy or share the number.</p>
+
+<div class="card">
+  <p class="user-name">@<%= u.username %></p>
+  <p class="stat-num"><%= u.phone ? u.phone : '— no phone on file —' %></p>
+  <p class="muted small">
+    <% if (u.phone_verified) { %><span class="badge badge-ok">verified</span><% } else { %><span class="badge">unverified</span><% } %>
+  </p>
+  <div class="form-row">
+    <a class="btn btn-ghost" href="/admin/users/<%= u.id %>">← Back to user detail</a>
+    <a class="btn btn-ghost" href="/admin/users">All users</a>
+  </div>
+</div>

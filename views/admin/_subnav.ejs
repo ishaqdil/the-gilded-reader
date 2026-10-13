@@ -1,0 +1,10 @@
+<% /* Admin sub-nav for sections added after the layout's built-in admin-nav.
+      layout.ejs cannot be edited by the admin module, so the new sections are
+      linked here, at the top of each new/extended admin view. */ %>
+<nav class="admin-subnav" aria-label="More admin sections">
+  <a class="btn btn-sm <%= path === '/admin/communities' || path.startsWith('/admin/communities') ? 'btn-primary' : 'btn-ghost' %>" href="/admin/communities">Communities</a>
+  <a class="btn btn-sm <%= path.startsWith('/admin/posts') ? 'btn-primary' : 'btn-ghost' %>" href="/admin/posts">Posts</a>
+  <a class="btn btn-sm <%= path.startsWith('/admin/reports') ? 'btn-primary' : 'btn-ghost' %>" href="/admin/reports">Reports</a>
+  <a class="btn btn-sm <%= path.startsWith('/admin/audit') ? 'btn-primary' : 'btn-ghost' %>" href="/admin/audit">Audit log</a>
+  <a class="btn btn-sm <%= path.startsWith('/admin/settings') ? 'btn-primary' : 'btn-ghost' %>" href="/admin/settings">Settings</a>
+</nav>

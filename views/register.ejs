@@ -1,0 +1,58 @@
+<div class="auth-wrap">
+  <div class="card auth-card">
+    <h1>The Gilded Cage</h1>
+    <p class="muted">Join the discussion — it takes seconds.</p>
+    <% if (error) { %><p class="alert alert-error" role="alert"><%= error %></p><% } %>
+    <% if (info) { %><p class="alert alert-ok" role="status"><%= info %></p><% } %>
+
+    <% if (authMode === 'otp' && step === 'verify') { %>
+      <form action="/api/otp/verify" method="post" novalidate>
+        <input type="hidden" name="purpose" value="register">
+        <input type="hidden" name="phone" value="<%= phone %>">
+        <input type="hidden" name="username" value="<%= username %>">
+        <div class="field">
+          <label for="code">6-digit code</label>
+          <input id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required>
+          <p class="hint">We sent it to <%= phone %> for @<%= username %> · expires in 10 minutes</p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Verify &amp; create account</button>
+      </form>
+      <p class="auth-switch"><a class="link" href="/register">← Start over</a></p>
+    <% } else if (authMode === 'otp') { %>
+      <form action="/register" method="post" novalidate>
+        <div class="field">
+          <label for="phone">Phone number</label>
+          <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="+923001234567" value="<%= phone %>" required>
+          <p class="hint">With country code, e.g. +923001234567 · only you and the admin can see it</p>
+        </div>
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" title="3–24 characters: letters, numbers, underscores" value="<%= username %>" required>
+          <p class="hint">3–24 characters · letters, numbers and underscores only · shown publicly</p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Send code</button>
+      </form>
+      <p class="auth-switch">Already have one? <a class="link" href="/login">Log in</a></p>
+    <% } else { %>
+      <form action="/register" method="post" novalidate>
+        <div class="field">
+          <label for="phone">Phone number</label>
+          <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="+923001234567" value="<%= phone %>" required>
+          <p class="hint">With country code, e.g. +923001234567 · only you and the admin can see it</p>
+        </div>
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_]{3,24}" title="3–24 characters: letters, numbers, underscores" value="<%= username %>" required>
+          <p class="hint">3–24 characters · letters, numbers and underscores only · shown publicly</p>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+          <p class="hint">At least 8 characters</p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Create account</button>
+      </form>
+      <p class="auth-switch">Already have one? <a class="link" href="/login">Log in</a></p>
+    <% } %>
+  </div>
+</div>

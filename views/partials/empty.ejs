@@ -1,0 +1,13 @@
+<%#
+  Empty-state partial. Locals: icon (emoji), title, text (optional).
+%>
+<%
+const _icon = (typeof icon !== 'undefined' && icon) ? icon : '📭';
+const _title = (typeof title !== 'undefined' && title) ? title : 'Nothing here yet';
+const _text = (typeof text !== 'undefined' && text) ? text : '';
+%>
+<div class="empty-state">
+  <p class="empty-icon" aria-hidden="true"><%= _icon %></p>
+  <h2><%= _title %></h2>
+  <% if (_text) { %><p class="muted"><%= _text %></p><% } %>
+</div>

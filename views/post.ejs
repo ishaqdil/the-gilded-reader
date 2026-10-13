@@ -1,0 +1,71 @@
+<%
+const _p = post;
+const _canEdit = (typeof canEdit !== 'undefined') && !!canEdit;
+const _canDelete = (typeof canDelete !== 'undefined') && !!canDelete;
+const _comm = (_p.community) ? _p.community : ((typeof community !== 'undefined' && community) ? community : null);
+%>
+<article class="card post-full">
+  <div class="post-full-head">
+    <%- include('partials/vote', { targetType: 'post', id: _p.id, score: _p.score, userVote: _p.userVote }) %>
+    <div>
+      <div class="post-card-top">
+        <% if (_p.pinned) { %><span class="badge badge-pin">📌 Pinned</span><% } %>
+        <% if (_comm) { %><a class="community-tag" href="/c/<%= _comm.slug %>">c/<%= _comm.title %></a><% } %>
+      </div>
+      <h1><%= _p.title %></h1>
+      <p class="post-meta muted">
+        <span class="meta-author"><%- include('partials/avatar', { name: _p.author && _p.author.avatar, cls: 'avatar avatar-xs' }) %><a class="link" href="/u/<%= _p.author.username %>">u/<%= _p.author.username %></a></span><span aria-hidden="true"> · </span>
+        <time datetime="<%= _p.createdAt %>"><%= fmtDate(_p.createdAt) %></time><span aria-hidden="true"> · </span>
+        <span><%= _p.commentCount %> comment<%= _p.commentCount === 1 ? '' : 's' %></span>
+      </p>
+    </div>
+  </div>
+
+  <div class="prose post-body">
+    <%- formatBody(_p.body) %>
+  </div>
+
+  <div class="post-actions action-row">
+    <% if (_canEdit) { %><button id="postEditToggle" class="btn btn-ghost btn-sm" aria-expanded="false" aria-controls="postEditForm">Edit</button><% } %>
+    <% if (_canDelete) { %><button id="postDelete" class="btn btn-danger-ghost btn-sm" data-post-id="<%= _p.id %>">Delete</button><% } %>
+    <% if (user) { %><button id="postReport" class="btn btn-ghost btn-sm" data-post-id="<%= _p.id %>">Report</button><% } %>
+  </div>
+
+  <% if (_canEdit) { %>
+  <form id="postEditForm" class="comment-form" hidden data-post-id="<%= _p.id %>" aria-label="Edit post">
+    <div class="field">
+      <label for="editPostTitle">Title</label>
+      <input id="editPostTitle" name="title" type="text" value="<%= _p.title %>" maxlength="200" required>
+    </div>
+    <div class="field">
+      <label for="editPostBody">Body</label>
+      <textarea id="editPostBody" name="body" rows="8" maxlength="10000" required><%= _p.body %></textarea>
+    </div>
+    <div class="form-row">
+      <button type="button" class="btn btn-ghost btn-sm" id="postEditCancel">Cancel</button>
+      <button type="submit" class="btn btn-primary btn-sm">Save changes</button>
+    </div>
+  </form>
+  <% } %>
+</article>
+
+<section class="comments" id="comments" aria-labelledby="comments-h">
+  <h2 id="comments-h">Discussion</h2>
+
+  <% if (user) { %>
+    <form class="comment-form" data-comment-form data-thread-type="post" data-thread-id="<%= _p.id %>">
+      <label for="commentBody">Share your thoughts <span class="muted">(be kind)</span></label>
+      <textarea id="commentBody" name="body" rows="3" maxlength="2000" placeholder="What do you think?" required data-autocount="charCount"></textarea>
+      <div class="form-row">
+        <span class="muted char-count"><span id="charCount">0</span>/2000</span>
+        <button type="submit" class="btn btn-primary">Post comment</button>
+      </div>
+    </form>
+  <% } else { %>
+    <div class="card login-nudge">
+      <p><a class="link" href="/login?next=<%= encodeURIComponent('/p/' + _p.id + '#comments') %>">Log in</a> or <a class="link" href="/register">create an account</a> to join the discussion.</p>
+    </div>
+  <% } %>
+
+  <div class="thread" data-thread="post" data-id="<%= _p.id %>" data-count="<%= _p.commentCount %>" aria-live="polite"></div>
+</section>

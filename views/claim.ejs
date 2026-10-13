@@ -1,0 +1,42 @@
+<div class="auth-wrap">
+  <div class="card auth-card">
+    <h1>The Gilded Cage</h1>
+    <p class="muted">Claim the admin account. This one-time link stops working the moment you finish.</p>
+    <% if (error) { %><p class="alert alert-error" role="alert"><%= error %></p><% } %>
+    <% if (info) { %><p class="alert alert-ok" role="status"><%= info %></p><% } %>
+
+    <% if (authMode === 'otp' && step === 'verify') { %>
+      <form action="/admin/claim" method="post" novalidate>
+        <input type="hidden" name="token" value="<%= token %>">
+        <input type="hidden" name="phone" value="<%= phone %>">
+        <% if (csrfToken) { %><input type="hidden" name="_csrf" value="<%= csrfToken %>"><% } %>
+        <div class="field">
+          <label for="code">6-digit code</label>
+          <input id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required>
+          <p class="hint">We sent it to <%= phone %> · expires in 10 minutes</p>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Verify &amp; claim admin</button>
+      </form>
+    <% } else { %>
+      <form action="/admin/claim" method="post" novalidate>
+        <input type="hidden" name="token" value="<%= token %>">
+        <% if (csrfToken) { %><input type="hidden" name="_csrf" value="<%= csrfToken %>"><% } %>
+        <div class="field">
+          <label for="phone">Admin phone number</label>
+          <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="+923001234567" value="<%= phone %>" required>
+          <p class="hint">With country code · kept private, visible only to you as admin</p>
+        </div>
+        <% if (authMode === 'password') { %>
+          <div class="field">
+            <label for="password">Set admin password</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+            <p class="hint">At least 8 characters</p>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Claim admin account</button>
+        <% } else { %>
+          <button type="submit" class="btn btn-primary btn-block">Send verification code</button>
+        <% } %>
+      </form>
+    <% } %>
+  </div>
+</div>

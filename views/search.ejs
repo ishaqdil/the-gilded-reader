@@ -1,0 +1,74 @@
+<%
+const _q = (typeof q !== 'undefined' && q) ? q : '';
+const _posts = (typeof posts !== 'undefined' && Array.isArray(posts)) ? posts : [];
+const _chapters = (typeof chapters !== 'undefined' && Array.isArray(chapters)) ? chapters : [];
+const _users = (typeof users !== 'undefined' && Array.isArray(users)) ? users : [];
+const _searched = (typeof q !== 'undefined');
+%>
+<div class="page-head">
+  <h1>Search</h1>
+  <p class="muted">Find posts, chapters and readers across the community.</p>
+</div>
+
+<form class="card search-form" action="/search" method="get" role="search">
+  <div class="field">
+    <label for="searchQ">Search the community</label>
+    <div class="search-row">
+      <input id="searchQ" name="q" type="search" value="<%= _q %>" maxlength="64" autocomplete="off" autofocus placeholder="Try a character name, a theory, a reader…">
+      <button class="btn btn-primary" type="submit">Search</button>
+    </div>
+  </div>
+</form>
+
+<% if (_searched) { %>
+  <% if (!_posts.length && !_chapters.length && !_users.length) { %>
+    <%- include('partials/empty', { icon: '🔍', title: 'No results', text: 'Nothing matched "' + _q + '". Try a different search.' }) %>
+  <% } else { %>
+
+    <% if (_posts.length) { %>
+    <section class="search-section" aria-labelledby="sp-h">
+      <div class="section-head"><h2 id="sp-h">Posts</h2></div>
+      <div class="feed">
+        <% _posts.forEach(function (item) { %>
+          <%- include('partials/post-card', { item: item }) %>
+        <% }) %>
+      </div>
+    </section>
+    <% } %>
+
+    <% if (_chapters.length) { %>
+    <section class="search-section" aria-labelledby="sc-h">
+      <div class="section-head"><h2 id="sc-h">Chapters</h2></div>
+      <div class="card-grid">
+        <% _chapters.forEach(function (c) { %>
+          <article class="card chapter-card">
+            <p class="card-kicker">Chapter <%= c.number %></p>
+            <h3 class="card-title"><%= c.title %></h3>
+            <% if (c.excerpt) { %><p class="card-excerpt"><%= c.excerpt %>…</p><% } %>
+            <div class="card-foot">
+              <time class="muted" datetime="<%= c.created_at %>"><%= fmtDate(c.created_at).split(',')[0] %></time>
+              <a class="btn btn-primary btn-sm" href="/chapter/<%= c.id %>">Read</a>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    </section>
+    <% } %>
+
+    <% if (_users.length) { %>
+    <section class="search-section" aria-labelledby="su-h">
+      <div class="section-head"><h2 id="su-h">Readers</h2></div>
+      <div class="card">
+        <% _users.forEach(function (u) { %>
+          <div class="user-row">
+            <%- include('partials/avatar', { name: u.avatar, cls: 'avatar avatar-sm' }) %>
+            <a class="link" href="/u/<%= u.username %>">@<%= u.username %></a>
+            <% if (u.bio) { %><span class="muted small"><%= u.bio %></span><% } %>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+    <% } %>
+
+  <% } %>
+<% } %>

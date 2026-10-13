@@ -1,0 +1,49 @@
+<div class="page-head split">
+  <div>
+    <h1>Reports</h1>
+    <p class="muted"><%= openCount %> open</p>
+  </div>
+  <div class="filter-row" role="group" aria-label="Filter reports">
+    <% ['open','resolved','dismissed','all'].forEach((s) => { %>
+      <a class="btn <%= statusF === s ? 'btn-primary' : 'btn-ghost' %> btn-sm" href="/admin/reports?status=<%= s %>"><%= s[0].toUpperCase() + s.slice(1) %></a>
+    <% }) %>
+  </div>
+</div>
+
+<%- include('_subnav') %>
+
+<% if (reports.length) { %>
+  <ul class="activity-list">
+    <% reports.forEach((r) => { %>
+      <li class="card mod-card">
+        <p class="activity-text"><%= r.reason %></p>
+        <p class="muted small">
+          reported by @<%= r.reporter %> ·
+          target: <%= r.target_type %> #<%= r.target_id %> ·
+          <% if (r.target_type === 'post') { %>“<%= r.post_title || '(deleted)' %>”
+          <% } else { %>“<%= r.comment_excerpt || '(deleted)' %>”<% } %> ·
+          <%= fmtDate(r.created_at) %>
+          <span class="badge <%= r.status === 'open' ? 'badge-warn' : 'badge-ok' %>"><%= r.status %></span>
+        </p>
+        <% if (r.status === 'open') { %>
+          <div class="mod-actions">
+            <form action="/admin/reports/<%= r.id %>/resolve" method="post" class="inline" data-confirm="Mark this report resolved?">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <label class="check muted small"><input type="checkbox" name="hide_target"> also hide the reported <%= r.target_type %></label>
+              <button type="submit" class="btn btn-primary btn-sm">Resolve</button>
+            </form>
+            <form action="/admin/reports/<%= r.id %>/dismiss" method="post" class="inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-ghost btn-sm">Dismiss</button>
+            </form>
+          </div>
+        <% } %>
+      </li>
+    <% }) %>
+  </ul>
+<% } else { %>
+  <div class="empty-state empty-inline">
+    <p class="empty-icon" aria-hidden="true">🚩</p>
+    <p class="muted"><%= statusF === 'open' ? 'No open reports. All clear.' : 'No reports with this status.' %></p>
+  </div>
+<% } %>

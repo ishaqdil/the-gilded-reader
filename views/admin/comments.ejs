@@ -1,0 +1,50 @@
+<div class="page-head split">
+  <div>
+    <h1>Comments</h1>
+    <p class="muted">Review and moderate reader discussion — chapter and post comments.</p>
+  </div>
+  <div class="filter-row" role="group" aria-label="Filter comments">
+    <a class="btn <%= filter === 'all' ? 'btn-primary' : 'btn-ghost' %> btn-sm" href="/admin/comments">All</a>
+    <a class="btn <%= filter === 'hidden' ? 'btn-primary' : 'btn-ghost' %> btn-sm" href="/admin/comments?f=hidden">Hidden</a>
+  </div>
+</div>
+
+<%- include('_subnav') %>
+
+<% if (comments.length) { %>
+  <ul class="activity-list">
+    <% comments.forEach((c) => { %>
+      <li class="card mod-card">
+        <p class="activity-text"><%= c.body %></p>
+        <p class="muted small">@<%= c.username %> ·
+          <% if (c.chid) { %><a class="link" href="/chapter/<%= c.chid %>#comments">Ch. <%= c.chnum %>: <%= c.chtitle %></a>
+          <% } else if (c.pid) { %><span class="badge badge-info">post</span> <%= c.ptitle %> (/<%= c.comslug %>)
+          <% } else { %><span class="muted">(context removed)</span><% } %>
+          · <%= fmtDate(c.created_at) %>
+          <% if (c.status === 'hidden') { %><span class="badge badge-warn">hidden</span><% } %></p>
+        <div class="mod-actions">
+          <% if (c.status === 'hidden') { %>
+            <form action="/admin/comments/<%= c.id %>/show" method="post" class="inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-primary btn-sm">Restore</button>
+            </form>
+          <% } else { %>
+            <form action="/admin/comments/<%= c.id %>/hide" method="post" class="inline" data-confirm="Hide this comment?">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-ghost btn-sm">Hide</button>
+            </form>
+          <% } %>
+          <form action="/admin/comments/<%= c.id %>/delete" method="post" class="inline" data-confirm="Permanently delete this comment?">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="btn btn-danger-ghost btn-sm">Delete</button>
+          </form>
+        </div>
+      </li>
+    <% }) %>
+  </ul>
+<% } else { %>
+  <div class="empty-state empty-inline">
+    <p class="empty-icon" aria-hidden="true">💬</p>
+    <p class="muted"><%= filter === 'hidden' ? 'No hidden comments. All clear.' : 'No comments yet.' %></p>
+  </div>
+<% } %>

@@ -1,0 +1,99 @@
+<div class="page-head split">
+  <div>
+    <h1>Communities</h1>
+    <p class="muted"><%= communities.length %> communit<%= communities.length === 1 ? 'y' : 'ies' %> total</p>
+  </div>
+</div>
+
+<%- include('_subnav') %>
+
+<% if (error) { %><p class="alert alert-error" role="alert"><%= error %></p><% } %>
+
+<div class="card form-card">
+  <h2>Create community</h2>
+  <form action="/admin/communities" method="post">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="form-grid-2">
+      <div class="field">
+        <label for="slug">Slug</label>
+        <input id="slug" name="slug" type="text" maxlength="32" value="<%= form.slug || '' %>" placeholder="e.g. announcements" required>
+        <p class="hint">2–32 chars: lowercase letters, numbers, hyphens. Unique.</p>
+      </div>
+      <div class="field check-field">
+        <label class="check"><input type="checkbox" name="allow_posts" <%= form.allow_posts === 0 ? '' : 'checked' %>> Allow member posts</label>
+        <p class="hint">Unchecked = announcements only (admins can still post via the community page).</p>
+      </div>
+    </div>
+    <div class="field">
+      <label for="title">Title</label>
+      <input id="title" name="title" type="text" maxlength="80" value="<%= form.title || '' %>" required>
+    </div>
+    <div class="field">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="3" maxlength="500" placeholder="What is this community for?"><%= form.description || '' %></textarea>
+    </div>
+    <div class="form-row">
+      <button type="submit" class="btn btn-primary">Create community</button>
+    </div>
+  </form>
+</div>
+
+<% if (communities.length) { %>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Slug</th><th>Title</th><th>Posts</th><th>Member posts</th><th><span class="sr-only">Actions</span></th></tr></thead>
+      <tbody>
+        <% communities.forEach((c) => { %>
+          <tr>
+            <td data-label="Slug"><code>/<%= c.slug %></code></td>
+            <td data-label="Title"><%= c.title %></td>
+            <td data-label="Posts"><%= c.post_count %></td>
+            <td data-label="Member posts"><%= c.allow_posts ? 'yes' : 'announcements only' %></td>
+            <td class="row-actions">
+              <form action="/admin/communities/<%= c.id %>/delete" method="post" class="inline" data-confirm="Delete /<%= c.slug %>? Only communities with no posts can be deleted.">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button type="submit" class="btn btn-danger-ghost btn-sm">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <section>
+    <h2>Edit communities</h2>
+    <% communities.forEach((c) => { %>
+      <div class="card form-card">
+        <form action="/admin/communities/<%= c.id %>" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="slug-<%= c.id %>">Slug</label>
+              <input id="slug-<%= c.id %>" name="slug" type="text" maxlength="32" value="<%= c.slug %>" required>
+            </div>
+            <div class="field check-field">
+              <label class="check"><input type="checkbox" name="allow_posts" <%= c.allow_posts ? 'checked' : '' %>> Allow member posts</label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="title-<%= c.id %>">Title</label>
+            <input id="title-<%= c.id %>" name="title" type="text" maxlength="80" value="<%= c.title %>" required>
+          </div>
+          <div class="field">
+            <label for="desc-<%= c.id %>">Description</label>
+            <textarea id="desc-<%= c.id %>" name="description" rows="2" maxlength="500"><%= c.description %></textarea>
+          </div>
+          <div class="form-row">
+            <button type="submit" class="btn btn-primary btn-sm">Save changes</button>
+          </div>
+        </form>
+      </div>
+    <% }) %>
+  </section>
+<% } else { %>
+  <div class="empty-state empty-inline">
+    <p class="empty-icon" aria-hidden="true">🏘️</p>
+    <p class="muted">No communities yet. Create the first one above.</p>
+  </div>
+<% } %>

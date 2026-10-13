@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<%
+const _siteName = (typeof siteName !== 'undefined' && siteName) ? siteName : 'The Gilded Cage';
+const _tagline = (typeof tagline !== 'undefined' && tagline) ? tagline : '';
+const _unread = (typeof unreadCount !== 'undefined' && Number(unreadCount) > 0) ? Number(unreadCount) : 0;
+const _communities = (typeof communities !== 'undefined' && Array.isArray(communities)) ? communities : [];
+const _rules = (typeof rulesText !== 'undefined' && rulesText) ? rulesText : ((typeof settings !== 'undefined' && settings && settings.rules) ? settings.rules : '');
+const _isAdmin = !!(user && user.role === 'admin');
+const _onAdmin = _isAdmin && (typeof path !== 'undefined') && path.startsWith('/admin');
+const _hideSidebar = (typeof path !== 'undefined') && (path === '/login' || path === '/register');
+const _title = (typeof title !== 'undefined' && title) ? title : '';
+const _q = (typeof q !== 'undefined' && q) ? q : '';
+%>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="<%= _tagline ? _tagline : 'Read the novel and discuss it with fellow readers.' %>">
+<meta name="theme-color" content="#14110c">
+<title><%= _title ? _title + ' · ' : '' %><%= _siteName %></title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<% if (csrfToken) { %><meta name="csrf-token" content="<%= csrfToken %>"><% } %>
+</head>
+<body data-is-admin="<%= _isAdmin ? '1' : '0' %>">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="<%= _siteName %> home">
+      <svg class="brand-logo" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <g stroke="#c9a227" stroke-width="4.5" fill="none" stroke-linecap="round">
+          <circle cx="32" cy="9" r="3.2"/>
+          <line x1="32" y1="12.5" x2="32" y2="15.5"/>
+          <path d="M18 31 C18 21 24 15.5 32 15.5 C40 15.5 46 21 46 31"/>
+          <line x1="24" y1="31" x2="24" y2="46"/>
+          <line x1="32" y1="31" x2="32" y2="46"/>
+          <line x1="40" y1="31" x2="40" y2="46"/>
+        </g>
+        <rect x="15" y="46" width="34" height="5.5" rx="2.75" fill="#c9a227"/>
+      </svg>
+      <span class="brand-name"><%= _siteName %></span>
+    </a>
+
+    <nav class="top-nav" aria-label="Primary">
+      <a href="/" class="<%= path === '/' ? 'active' : '' %>" <%= path === '/' ? 'aria-current="page"' : '' %>>Home</a>
+      <a href="/chapters" class="<%= path.startsWith('/chapter') ? 'active' : '' %>" <%= path.startsWith('/chapter') ? 'aria-current="page"' : '' %>>Chapters</a>
+    </nav>
+
+    <form class="header-search" action="/search" method="get" role="search">
+      <label class="sr-only" for="siteSearch">Search</label>
+      <input id="siteSearch" name="q" type="search" placeholder="Search posts, chapters, readers…" value="<%= _q %>" autocomplete="off" maxlength="64">
+      <button type="submit" class="search-btn" aria-label="Search">
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M11.7 10.3a5.5 5.5 0 1 0-1.4 1.4l3.3 3.3 1.4-1.4-3.3-3.3zM7 10.5A3.5 3.5 0 1 1 7 3.5a3.5 3.5 0 0 1 0 7z" fill="currentColor"/></svg>
+      </button>
+    </form>
+
+    <div class="header-actions">
+      <button id="themeBtn" class="icon-btn" aria-label="Switch to light mode" title="Toggle light / dark mode">
+        <svg class="icon-sun" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.5a.9.9 0 0 1 .9.9v1.1a.9.9 0 0 1-1.8 0V2.4a.9.9 0 0 1 .9-.9zm5.3 2L12.5 4.3a.9.9 0 0 1-1.3-1.3l.8-.8a.9.9 0 0 1 1.3 1.3zM14.5 7v1.8h-1.1a.9.9 0 0 1 0-1.8h1.1zM8 4.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zM2.7 3.5l.8.8a.9.9 0 0 1-1.3 1.3l-.8-.8a.9.9 0 0 1 1.3-1.3zM3.5 7a.9.9 0 0 1 0 1.8H2.4V7h1.1zm-1.3 6.5.8-.8a.9.9 0 0 1 1.3 1.3l-.8.8a.9.9 0 0 1-1.3-1.3zM8 12.5a.9.9 0 0 1 .9.9v1.1a.9.9 0 0 1-1.8 0v-1.1a.9.9 0 0 1 .9-.9zm5.3-1.2a.9.9 0 0 1 1.3 1.3l-.8.8a.9.9 0 0 1-1.3-1.3l.8-.8z" fill="currentColor"/></svg>
+        <svg class="icon-moon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M13.6 9.8A5.8 5.8 0 0 1 6.2 2.4a.7.7 0 0 0-.9-.9 7.2 7.2 0 1 0 9.2 9.2.7.7 0 0 0-.9-.9z" fill="currentColor"/></svg>
+      </button>
+
+      <% if (user) { %>
+        <a class="icon-btn bell" href="/notifications" aria-label="Inbox<%= _unread ? ', ' + _unread + ' unread' : '' %>">
+          <span aria-hidden="true" class="bell-emoji">🔔</span>
+          <% if (_unread) { %><span class="badge-dot" aria-hidden="true"><%= _unread > 99 ? '99+' : _unread %></span><% } %>
+        </a>
+        <div class="profile-menu">
+          <button id="profileBtn" class="profile-btn" aria-haspopup="true" aria-expanded="false" aria-controls="profileMenu" data-username="<%= user.username %>">
+            <%- include('partials/avatar', { name: user.avatar, cls: 'avatar avatar-sm' }) %>
+            <span class="profile-name">@<%= user.username %></span>
+            <svg class="caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <div id="profileMenu" class="menu" role="menu" hidden>
+            <a href="/me" role="menuitem">My profile</a>
+            <a href="/u/<%= user.username %>" role="menuitem">Public profile</a>
+            <% if (_isAdmin) { %><a href="/admin" role="menuitem">Admin</a><% } %>
+            <form action="/logout" method="post" class="menu-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" role="menuitem">Log out</button>
+            </form>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/login" class="btn btn-ghost btn-sm">Log in</a>
+        <a href="/register" class="btn btn-primary btn-sm">Sign up</a>
+      <% } %>
+    </div>
+  </div>
+</header>
+
+<% if (_onAdmin) { %>
+<nav class="admin-nav" aria-label="Admin sections">
+  <a href="/admin" class="<%= path === '/admin' ? 'active' : '' %>">Dashboard</a>
+  <a href="/admin/chapters" class="<%= path.startsWith('/admin/chapters') ? 'active' : '' %>">Chapters</a>
+  <a href="/admin/users" class="<%= path.startsWith('/admin/users') ? 'active' : '' %>">Users</a>
+  <a href="/admin/comments" class="<%= path.startsWith('/admin/comments') ? 'active' : '' %>">Comments</a>
+  <a href="/admin/communities" class="<%= path.startsWith('/admin/communities') ? 'active' : '' %>">Communities</a>
+  <a href="/admin/posts" class="<%= path.startsWith('/admin/posts') ? 'active' : '' %>">Posts</a>
+  <a href="/admin/reports" class="<%= path.startsWith('/admin/reports') ? 'active' : '' %>">Reports</a>
+  <a href="/admin/audit" class="<%= path.startsWith('/admin/audit') ? 'active' : '' %>">Audit</a>
+  <a href="/admin/settings" class="<%= path.startsWith('/admin/settings') ? 'active' : '' %>">Settings</a>
+</nav>
+<% } %>
+
+<div class="page-shell<%= _hideSidebar ? ' no-sidebar' : '' %>">
+  <main id="main" class="page-main">
+    <%- body %>
+  </main>
+
+  <% if (!_hideSidebar) { %>
+  <aside class="sidebar" aria-label="About this community">
+    <section class="card side-card">
+      <h2>About <%= _siteName %></h2>
+      <% if (_tagline) { %><p class="side-tagline"><%= _tagline %></p><% } %>
+      <p class="muted small">A home for readers of the novel — follow new chapters, share theories, and talk with fellow readers.</p>
+      <div class="action-row">
+        <a class="btn btn-primary btn-sm" href="/chapters">Start reading</a>
+        <% if (!user) { %><a class="btn btn-ghost btn-sm" href="/register">Join</a><% } %>
+      </div>
+    </section>
+
+    <% if (_communities.length) { %>
+    <section class="card side-card" aria-labelledby="sideComms">
+      <h2 id="sideComms">Communities</h2>
+      <ul class="side-list">
+        <% _communities.forEach((c) => { %>
+          <li>
+            <a class="link" href="/c/<%= c.slug %>">c/<%= c.title %></a>
+            <% if (c.description) { %><p class="muted small side-desc"><%= c.description %></p><% } %>
+          </li>
+        <% }) %>
+      </ul>
+    </section>
+    <% } %>
+
+    <% if (_rules) { %>
+    <section class="card side-card" aria-labelledby="sideRules">
+      <h2 id="sideRules">House rules</h2>
+      <div class="rules-body"><%- (typeof formatBody !== 'undefined') ? formatBody(_rules) : '' %></div>
+    </section>
+    <% } %>
+  </aside>
+  <% } %>
+</div>
+
+<nav class="bottom-nav" aria-label="Mobile navigation">
+  <a href="/" class="<%= path === '/' ? 'active' : '' %>" <%= path === '/' ? 'aria-current="page"' : '' %>><span class="bic" aria-hidden="true">🏠</span><span>Home</span></a>
+  <a href="/chapters" class="<%= path.startsWith('/chapter') ? 'active' : '' %>"><span class="bic" aria-hidden="true">📖</span><span>Chapters</span></a>
+  <a href="/search" class="<%= path === '/search' ? 'active' : '' %>"><span class="bic" aria-hidden="true">🔍</span><span>Search</span></a>
+  <a href="/notifications" class="<%= path === '/notifications' ? 'active' : '' %>"><span class="bic" aria-hidden="true">🔔</span><span>Inbox</span><% if (_unread) { %><span class="badge-dot nav-dot" aria-hidden="true"><%= _unread > 99 ? '99+' : _unread %></span><% } %></a>
+  <% if (user) { %>
+    <a href="/me" class="<%= path === '/me' ? 'active' : '' %>"><span class="bic" aria-hidden="true">👤</span><span>Profile</span></a>
+  <% } else { %>
+    <a href="/login" class="<%= path === '/login' ? 'active' : '' %>"><span class="bic" aria-hidden="true">👤</span><span>Log in</span></a>
+  <% } %>
+</nav>
+
+<footer class="site-footer">
+  <p><strong><%= _siteName %></strong><% if (_tagline) { %> · <%= _tagline %><% } %></p>
+  <p class="muted small">Read &amp; discuss · <span id="year"></span></p>
+</footer>
+
+<div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+<script src="/static/js/app.js" defer></script>
+</body>
+</html>

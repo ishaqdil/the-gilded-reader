@@ -1,0 +1,53 @@
+<%
+const _siteName = (typeof siteName !== 'undefined' && siteName) ? siteName : 'The Gilded Cage';
+const _tagline = (typeof tagline !== 'undefined' && tagline) ? tagline : '';
+const _items = (typeof items !== 'undefined' && Array.isArray(items)) ? items : [];
+const _sort = (typeof sort !== 'undefined' && sort) ? sort : 'latest';
+const _counts = (typeof counts !== 'undefined' && counts) ? counts : null;
+const _page = (typeof page !== 'undefined') ? page : 1;
+const _totalPages = (typeof totalPages !== 'undefined') ? totalPages : 1;
+const _base = '/?sort=' + encodeURIComponent(_sort);
+%>
+<section class="hero hero-compact">
+  <p class="eyebrow"><%= _tagline ? _tagline : 'A novel, one chapter at a time' %></p>
+  <h1><%= _siteName %></h1>
+  <p class="lede">New chapters drop here first. Read comfortably on any device, then join the discussion with fellow readers.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="/chapters">Start reading</a>
+    <% if (!user) { %><a class="btn btn-ghost" href="/register">Create account</a><% } %>
+  </div>
+  <% if (_counts) { %>
+  <dl class="stat-row">
+    <div><dt>Chapters</dt><dd><%= _counts.chapters %></dd></div>
+    <div><dt>Comments</dt><dd><%= _counts.comments %></dd></div>
+    <div><dt>Readers</dt><dd><%= _counts.readers %></dd></div>
+  </dl>
+  <% } %>
+</section>
+
+<section aria-labelledby="feed-h">
+  <div class="section-head">
+    <h2 id="feed-h">Community feed</h2>
+  </div>
+  <nav class="sort-tabs" aria-label="Sort feed">
+    <% [['latest', 'Latest'], ['popular', 'Popular'], ['discussed', 'Most discussed']].forEach(function (t) { %>
+      <a href="/?sort=<%= t[0] %>" class="<%= _sort === t[0] ? 'active' : '' %>" <%= _sort === t[0] ? 'aria-current="page"' : '' %>><%= t[1] %></a>
+    <% }) %>
+  </nav>
+
+  <% if (_items.length) { %>
+    <div class="feed">
+      <% _items.forEach(function (item) { %>
+        <%- include('partials/post-card', { item: item }) %>
+      <% }) %>
+    </div>
+    <%- include('partials/pagination', { page: _page, totalPages: _totalPages, baseUrl: _base }) %>
+  <% } else { %>
+    <div class="empty-state">
+      <p class="empty-icon" aria-hidden="true">💬</p>
+      <h2>No posts yet</h2>
+      <p class="muted">No posts yet — be the first to start a discussion.</p>
+      <a class="btn btn-primary" href="/chapters">Read a chapter</a>
+    </div>
+  <% } %>
+</section>

@@ -1,0 +1,98 @@
+<div class="page-head">
+  <h1>Dashboard</h1>
+  <p class="muted">A quick look at the health of your site.</p>
+</div>
+
+<%- include('_subnav') %>
+
+<div class="stat-cards">
+  <div class="card stat"><p class="stat-num"><%= stats.users %></p><p class="muted">Users</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.admins %></p><p class="muted">Admins</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.blocked %></p><p class="muted">Blocked users</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.published %><span class="muted small">/<%= stats.chapters %></span></p><p class="muted">Published chapters</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.communities %></p><p class="muted">Communities</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.postsVisible %><span class="muted small">/<%= stats.postsVisible + stats.postsHidden %></span></p><p class="muted">Visible posts</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.postsHidden %></p><p class="muted">Hidden posts</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.commentsVisible %><span class="muted small">/<%= stats.commentsVisible + stats.commentsHidden %></span></p><p class="muted">Visible comments</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.commentsHidden %></p><p class="muted">Hidden comments</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.votes %></p><p class="muted">Votes</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.reportsOpen %></p><p class="muted">Open reports</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.notifications %></p><p class="muted">Notifications</p></div>
+  <div class="card stat"><p class="stat-num"><%= stats.phoneViews %></p><p class="muted">Phone views (30d)</p></div>
+</div>
+
+<section>
+  <div class="section-head">
+    <h2>Recent comments</h2>
+    <a class="link" href="/admin/comments">Moderate all →</a>
+  </div>
+  <% if (recentComments.length) { %>
+    <ul class="activity-list">
+      <% recentComments.forEach((c) => { %>
+        <li class="card">
+          <p class="activity-text"><%= c.body %></p>
+          <p class="muted small">@<%= c.username %> ·
+            <% if (c.chid) { %>Ch. <%= c.chnum %>: <%= c.chtitle %>
+            <% } else if (c.pid) { %>Post: <%= c.ptitle %> (/<%= c.comslug %>)
+            <% } else { %>(no context)<% } %>
+            · <%= fmtDate(c.created_at) %>
+            <% if (c.status === 'hidden') { %><span class="badge badge-warn">hidden</span><% } %></p>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <div class="empty-state empty-inline"><p class="muted">No comments yet.</p></div>
+  <% } %>
+</section>
+
+<section>
+  <div class="section-head">
+    <h2>Recent posts</h2>
+    <a class="link" href="/admin/posts">Manage all →</a>
+  </div>
+  <% if (recentPosts.length) { %>
+    <ul class="activity-list">
+      <% recentPosts.forEach((p) => { %>
+        <li class="card">
+          <p class="activity-text"><%= p.title %></p>
+          <p class="muted small">@<%= p.username %> · /<%= p.comslug %> · <%= fmtDate(p.created_at) %>
+            <% if (p.pinned) { %><span class="badge badge-info">pinned</span><% } %>
+            <% if (p.status === 'hidden') { %><span class="badge badge-warn">hidden</span><% } %></p>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <div class="empty-state empty-inline"><p class="muted">No posts yet.</p></div>
+  <% } %>
+</section>
+
+<section>
+  <div class="section-head">
+    <h2>Recent admin activity</h2>
+    <a class="link" href="/admin/audit">Full audit log →</a>
+  </div>
+  <% if (recentAudit.length) { %>
+    <ul class="activity-list">
+      <% recentAudit.forEach((a) => { %>
+        <li class="card">
+          <p class="activity-text"><%= a.action %>
+            <% if (a.admin_name) { %><span class="muted"> by @<%= a.admin_name %></span><% } %></p>
+          <p class="muted small"><%= a.target_type ? a.target_type + (a.target_id != null ? ' #' + a.target_id : '') : '' %>
+            <% if (a.detail) { %> · <%= a.detail %><% } %> · <%= fmtDate(a.created_at) %></p>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <div class="empty-state empty-inline"><p class="muted">No admin actions logged yet.</p></div>
+  <% } %>
+</section>
+
+<section>
+  <h2>Quick actions</h2>
+  <div class="action-row">
+    <a class="btn btn-primary" href="/admin/chapters/new">＋ New chapter</a>
+    <a class="btn btn-ghost" href="/admin/users">Manage users</a>
+    <a class="btn btn-ghost" href="/admin/comments?f=hidden">Review hidden</a>
+    <a class="btn btn-ghost" href="/admin/reports">Review reports</a>
+  </div>
+</section>
